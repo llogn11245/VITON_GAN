@@ -86,7 +86,7 @@ class FeatureRegression(nn.Module):
 
     def forward(self, x):
         x = self.conv(x)
-        x = x.contiugous().view(x.size(0), -1)
+        x = x.contiguous().view(x.size(0), -1)
         x = self.linear(x)
         x = self.tanh(x)
         return x
