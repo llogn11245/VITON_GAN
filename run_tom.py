@@ -6,6 +6,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
+from skimage.metrics import peak_signal_noise_ratio as psnr
+from skimage.metrics import structural_similarity as ssim
 from dataset import TOMDataset
 from networks import UnetGenerator, load_checkpoint, save_checkpoint
 from visualize import save_images, save_visual
@@ -13,9 +15,9 @@ from utils import mkdir
 
 def get_opt():
     parser = argparse.ArgumentParser(description='Run TOM model')
-    parser.add_argument('--checkpoint', '-c', type=str, default='../result/TOM/gen_epoch_50.pth', help='checkpoint to load')
-    parser.add_argument('--data_root', '-d', type=str, default='data', help='path to data root directory')
-    parser.add_argument('--out_dir', '-o', type=str, default='../result', help='path to result directory')
+    parser.add_argument('--checkpoint', '-c', type=str, default='/content/result/train_tom/TOM/gen_epoch_01.pth', help='checkpoint to load')
+    parser.add_argument('--data_root', '-d', type=str, default='/content/viton_gan', help='path to data root directory')
+    parser.add_argument('--out_dir', '-o', type=str, default='/content/result/run_tom', help='path to result directory')
     parser.add_argument('--name', '-n', type=str, default='TOM', help='model name')
     parser.add_argument('--batch_size', '-b', type=int, default=16, help='batch size')
     parser.add_argument('--n_worker', '-w', type=int, default=16, help='number of workers')
@@ -63,7 +65,7 @@ def run(opt, model, data_loader, mode):
 				[rendered_person, tryon_person, person]]
 		save_images(tryon_person, cloth_name, tryon_dir) 
 		save_visual(visuals, cloth_name, visual_dir)
-        
+
 def main():
 	opt = get_opt()
 	print(opt)
@@ -80,6 +82,7 @@ def main():
 	with torch.no_grad():
 		run(opt, model, dataloader, mode)
 	print('Successfully completed')
+
 
 if __name__=='__main__':
     main()
