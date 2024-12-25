@@ -159,7 +159,7 @@ class GMMDataset(DatasetBase):
         cloth_tensor = self.transform(cloth_im)  # [-1,1]
         cloth_mask_im = Image.open(os.path.join(self.data_path, 'cloth mask', cloth_name))
         cloth_mask_tensor = binarized_tensor(np.array(cloth_mask_im))
-        grid_im = Image.open('/kaggle/input/viton-gan/viton_train_again/grid.png')
+        grid_im = Image.open('/content/viton_gan/grid.png')
         grid_tensor = self.transform(grid_im)
 
         data = self._get_item_base(index)
