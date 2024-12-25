@@ -13,9 +13,9 @@ from utils import mkdir
 
 def get_opt():
     parser = argparse.ArgumentParser(description='Run GMM model')
-    parser.add_argument('--checkpoint', '-c', type=str, default='../result/GMM/epoch_99.pth', help='checkpoint to load')
-    parser.add_argument('--data_root', '-d', type=str, default='data', help='path to data root directory')
-    parser.add_argument('--out_dir', '-o', type=str, default='../result', help='path to result directory')
+    parser.add_argument('--checkpoint', '-c', type=str, default='/content/result/train_gmm/GMM/epoch_01.pth', help='checkpoint to load')
+    parser.add_argument('--data_root', '-d', type=str, default='/content/viton_gan', help='path to data root directory')
+    parser.add_argument('--out_dir', '-o', type=str, default='/content/result/run_gmm', help='path to result directory')
     parser.add_argument('--name', '-n', type=str, default='GMM', help='model name')
     parser.add_argument('--batch_size', '-b', type=int, default=16, help='batch size')
     parser.add_argument('--n_worker', '-w', type=int, default=16, help='number of workers')
