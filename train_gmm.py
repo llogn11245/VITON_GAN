@@ -82,8 +82,8 @@ class GMMTrainer:
 def get_opt():
     parser = argparse.ArgumentParser(description='Train GMM model')
     parser.add_argument('--n_epoch', '-e', type=int, default=2, help='number of epochs')
-    parser.add_argument('--data_root', '-d', type=str, default='archive/', help='path to data root directory')
-    parser.add_argument('--out_dir', '-o', type=str, default='result/', help='path to result directory')
+    parser.add_argument('--data_root', '-d', type=str, default='/content/viton_gan', help='path to data root directory')
+    parser.add_argument('--out_dir', '-o', type=str, default='/content/result/train_gmm', help='path to result directory')
     parser.add_argument('--name', '-n', type=str, default='GMM', help='model name')
     parser.add_argument('--batch_size', '-b', type=int, default=16, help='batch size')
     parser.add_argument('--n_worker', '-w', type=int, default=16, help='number of workers')
@@ -101,10 +101,10 @@ def main():
     print(opt)
 
     print('Loading dataset')
-    dataset_train = GMMDataset(opt, mode='train', data_list='archive\\train_pairs.txt')
+    dataset_train = GMMDataset(opt, mode='train', data_list='/content/viton_gan/train_pairs.txt')
     dataloader_train = DataLoader(dataset_train, batch_size=opt.batch_size, num_workers=opt.n_worker, shuffle=True)
-    # dataset_val = GMMDataset(opt, mode='val', data_list='archive\\test_pairs.txt', train=False)
-    # dataloader_val = DataLoader(dataset_val, batch_size=opt.batch_size, num_workers=opt.n_worker, shuffle=True)
+    dataset_val = GMMDataset(opt, mode='val', data_list='/content/viton_gan/test_pairs.txt', train=False)
+    dataloader_val = DataLoader(dataset_val, batch_size=opt.batch_size, num_workers=opt.n_worker, shuffle=True)
 
     save_dir = os.path.join(opt.out_dir, opt.name)
     log_dir = os.path.join(opt.out_dir, 'log')
