@@ -4,6 +4,7 @@ from tqdm import tqdm
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from skimage.metrics import peak_signal_noise_ratio as psnr
@@ -31,40 +32,60 @@ def get_opt():
     return opt
 
 def run(opt, model, data_loader, mode):
-	if torch.cuda.is_available():
-		device = torch.device('cuda:'+str(opt.gpu_id))  
-	else:
-		device = torch.device('cpu')
-	model = model.to(device)
+    if torch.cuda.is_available():
+        device = torch.device('cuda:' + str(opt.gpu_id))  
+    else:
+        device = torch.device('cpu')
+    model = model.to(device)
 
-	tryon_dir = os.path.join(opt.data_root, mode, 'tryon-person')
-	mkdir(tryon_dir)
-	visual_dir = os.path.join(opt.out_dir, opt.name, mode)
-	mkdir(visual_dir)
+    # Thư mục lưu ảnh
+    tryon_dir = os.path.join(opt.data_root, mode, 'tryon-person')
+    mkdir(tryon_dir)
 
-	data_iter = tqdm(data_loader, total=len(data_loader), bar_format='{l_bar}{r_bar}')
-	for _data in data_iter:
-		data = {}
-		for key, value in _data.items():
-			if not 'name' in key:
-				data[key] = value.to(device) # Load data on GPU
-			else:
-				data[key] = value
-		cloth = data['cloth']
-		cloth_mask = data['cloth_mask']
-		person = data['person']
-		cloth_name = data['cloth_name']
+    visual_dir = os.path.join(opt.out_dir, opt.name, mode)
+    mkdir(visual_dir)
 
-		outputs = model(torch.cat([data['feature'], cloth],1)) # (batch, channel, height, width)
-		rendered_person, composition_mask = torch.split(outputs, 3,1)
-		rendered_person = torch.tanh(rendered_person)
-		composition_mask = torch.sigmoid(composition_mask)
-		tryon_person = cloth*composition_mask + rendered_person*(1-composition_mask)
-		visuals = [[data['head'], data['shape'], data['pose']], 
-				[cloth, cloth_mask*2-1, composition_mask*2-1], 
-				[rendered_person, tryon_person, person]]
-		save_images(tryon_person, cloth_name, tryon_dir) 
-		save_visual(visuals, cloth_name, visual_dir)
+    # Thư mục lưu ảnh kết quả cuối cùng
+    final_results_dir = os.path.join(opt.out_dir, opt.name, mode, 'final-results')
+    mkdir(final_results_dir)
+
+    data_iter = tqdm(data_loader, total=len(data_loader), bar_format='{l_bar}{r_bar}')
+    for batch_idx, _data in enumerate(data_iter):
+        data = {}
+        for key, value in _data.items():
+            if not 'name' in key:
+                data[key] = value.to(device)  # Load data on GPU
+            else:
+                data[key] = value
+
+        cloth = data['cloth']
+        cloth_mask = data['cloth_mask']
+        person = data['person']
+        cloth_name = data['cloth_name']
+
+        outputs = model(torch.cat([data['feature'], cloth], 1))  # (batch, channel, height, width)
+        rendered_person, composition_mask = torch.split(outputs, 3, 1)
+        rendered_person = torch.tanh(rendered_person)
+        composition_mask = torch.sigmoid(composition_mask)
+        tryon_person = cloth * composition_mask + rendered_person * (1 - composition_mask)
+
+        visuals = [[data['head'], data['shape'], data['pose']], 
+                   [cloth, cloth_mask * 2 - 1, composition_mask * 2 - 1], 
+                   [rendered_person, tryon_person, person]]
+
+        # Lưu tất cả ảnh
+        save_images(tryon_person, cloth_name, tryon_dir)
+        save_visual(visuals, cloth_name, visual_dir)
+
+        # Nếu batch cuối cùng, lưu ảnh vào thư mục riêng và tính độ đo
+        if batch_idx == len(data_loader) - 1:
+            for idx, name in enumerate(cloth_name):
+                # Lưu ảnh cuối cùng
+                save_images(tryon_person[idx:idx+1], [name], final_results_dir)
+
+    print(f"Final images saved in: {final_results_dir}")
+
+
 
 def main():
 	opt = get_opt()
