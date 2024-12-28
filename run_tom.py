@@ -16,9 +16,9 @@ from utils import mkdir
 
 def get_opt():
     parser = argparse.ArgumentParser(description='Run TOM model')
-    parser.add_argument('--checkpoint', '-c', type=str, default='/content/result/train_tom/TOM/gen_epoch_01.pth', help='checkpoint to load')
-    parser.add_argument('--data_root', '-d', type=str, default='/content/viton_gan', help='path to data root directory')
-    parser.add_argument('--out_dir', '-o', type=str, default='/content/result/run_tom', help='path to result directory')
+    parser.add_argument('--checkpoint', '-c', type=str, default='/result/train_tom/TOM/gen_epoch_99.pth', help='checkpoint to load')
+    parser.add_argument('--data_root', '-d', type=str, default='/viton_gan', help='path to data root directory')
+    parser.add_argument('--out_dir', '-o', type=str, default='/result/run_tom', help='path to result directory')
     parser.add_argument('--name', '-n', type=str, default='TOM', help='model name')
     parser.add_argument('--batch_size', '-b', type=int, default=16, help='batch size')
     parser.add_argument('--n_worker', '-w', type=int, default=16, help='number of workers')
@@ -46,7 +46,7 @@ def run(opt, model, data_loader, mode):
     mkdir(visual_dir)
 
     # Thư mục lưu ảnh kết quả cuối cùng
-    final_results_dir = os.path.join(opt.out_dir, opt.name, mode, 'final-results')
+    final_results_dir = os.path.join(opt.out_dir, opt.name, 'final-results')
     mkdir(final_results_dir)
 
     data_iter = tqdm(data_loader, total=len(data_loader), bar_format='{l_bar}{r_bar}')
@@ -74,14 +74,8 @@ def run(opt, model, data_loader, mode):
                    [rendered_person, tryon_person, person]]
 
         # Lưu tất cả ảnh
-        save_images(tryon_person, cloth_name, tryon_dir)
+        save_images(tryon_person, cloth_name, final_results_dir)
         save_visual(visuals, cloth_name, visual_dir)
-
-        # Nếu batch cuối cùng, lưu ảnh vào thư mục riêng và tính độ đo
-        if batch_idx == len(data_loader) - 1:
-            for idx, name in enumerate(cloth_name):
-                # Lưu ảnh cuối cùng
-                save_images(tryon_person[idx:idx+1], [name], final_results_dir)
 
     print(f"Final images saved in: {final_results_dir}")
 
