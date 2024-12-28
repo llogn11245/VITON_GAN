@@ -22,8 +22,8 @@ class TOMTrainer:
 
         self.dataloader_train = dataloader_train
         self.dataloader_val = dataloader_val
-        self.optim_g = torch.optim.Adam(gen.parameters(), lr=1e-4, betas=(0.5, 0.999))
-        self.optim_d = torch.optim.Adam(dis.parameters(), lr=1e-4, betas=(0.5, 0.999))
+        self.optim_g = torch.optim.Adam(gen.parameters(), lr=0.00035, betas=(0.5, 0.999))
+        self.optim_d = torch.optim.Adam(dis.parameters(), lr=0.00035, betas=(0.5, 0.999))
         self.criterionL1 = nn.L1Loss()
         self.criterionVGG = VGGLoss()
         self.criterionAdv = torch.nn.BCELoss()
