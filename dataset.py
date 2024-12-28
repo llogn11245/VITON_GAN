@@ -87,20 +87,13 @@ class DatasetBase(Dataset):
             feature_pose_tensor[i] = one_map[0]
         pose_tensor = self.transform(pose_im) # [-1,1]
         return feature_pose_tensor, pose_tensor
-    
-    def resize_tensor(self, input_tensor, size):
-        input_tensor = input_tensor.unsqueeze(0)  # Thêm một chiều batch
-        resized_tensor = F.interpolate(input_tensor, size=size, mode='bilinear', align_corners=False)
-        resized_tensor = resized_tensor.squeeze(0)  # Loại bỏ chiều batch
-        return resized_tensor
-
+        
     def _get_item_base(self, index):
         # Person
         person_name = self.person_names[index] 
         person_im = Image.open(os.path.join(self.data_path, 'person', person_name))
         person_tensor = self.transform(person_im) # [-1,1]
-        person_tensor = self.resize_tensor(person_tensor, (256, 192))
-
+        
         # Person-parse
         parse_name = person_name.replace('.jpg', '.png')
         person_parse = Image.open(os.path.join(self.data_path, 'person-parse', parse_name))
