@@ -20,6 +20,7 @@ class GMMTrainer:
         self.model = model.to(self.device)
 
         self.dataloader_train = dataloader_train
+        self.dataloader_val = dataloader_val
         self.optim = torch.optim.Adam(self.model.parameters(), lr=0.00035, betas=(0.5, 0.999))
         self.criterionL1 = nn.L1Loss()
         self.log_freq = log_freq
