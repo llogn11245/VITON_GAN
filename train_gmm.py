@@ -12,7 +12,7 @@ from visualize import board_add_images
 from utils import mkdir
 
 class GMMTrainer:
-    def __init__(self, model, dataloader_train, gpu_id, log_freq, save_dir):
+    def __init__(self, model, dataloader_train, dataloader_val, gpu_id, log_freq, save_dir):
         if torch.cuda.is_available():
             self.device = torch.device('cuda:'+str(gpu_id))  
         else:
@@ -21,7 +21,7 @@ class GMMTrainer:
 
         self.dataloader_train = dataloader_train
         self.dataloader_val = dataloader_val
-        self.optim = torch.optim.Adam(self.model.parameters(), lr=0.00035, betas=(0.5, 0.999))
+        self.optim = torch.optim.Adam(self.model.parameters(), lr=1e-4, betas=(0.5, 0.999))
         self.criterionL1 = nn.L1Loss()
         self.log_freq = log_freq
         self.save_dir = save_dir
@@ -83,8 +83,8 @@ class GMMTrainer:
 def get_opt():
     parser = argparse.ArgumentParser(description='Train GMM model')
     parser.add_argument('--n_epoch', '-e', type=int, default=100, help='number of epochs')
-    parser.add_argument('--data_root', '-d', type=str, default='/content/viton_gan', help='path to data root directory')
-    parser.add_argument('--out_dir', '-o', type=str, default='/content/result/train_gmm', help='path to result directory')
+    parser.add_argument('--data_root', '-d', type=str, default='data', help='path to data root directory')
+    parser.add_argument('--out_dir', '-o', type=str, default='../result', help='path to result directory')
     parser.add_argument('--name', '-n', type=str, default='GMM', help='model name')
     parser.add_argument('--batch_size', '-b', type=int, default=16, help='batch size')
     parser.add_argument('--n_worker', '-w', type=int, default=16, help='number of workers')
@@ -102,9 +102,9 @@ def main():
     print(opt)
 
     print('Loading dataset')
-    dataset_train = GMMDataset(opt, mode='train', data_list='/content/viton_gan/train_pairs.txt')
+    dataset_train = GMMDataset(opt, mode='train', data_list='train_pairs.txt')
     dataloader_train = DataLoader(dataset_train, batch_size=opt.batch_size, num_workers=opt.n_worker, shuffle=True)
-    dataset_val = GMMDataset(opt, mode='val', data_list='/content/viton_gan/test_pairs.txt', train=False)
+    dataset_val = GMMDataset(opt, mode='val', data_list='val_pairs.txt', train=False)
     dataloader_val = DataLoader(dataset_val, batch_size=opt.batch_size, num_workers=opt.n_worker, shuffle=True)
 
     save_dir = os.path.join(opt.out_dir, opt.name)
@@ -119,7 +119,7 @@ def main():
     print('Building GMM model')
     model = GMM(opt)
     model.cuda()
-    trainer = GMMTrainer(model, dataloader_train, opt.gpu_id, opt.log_freq, save_dir)
+    trainer = GMMTrainer(model, dataloader_train, dataloader_val, opt.gpu_id, opt.log_freq, save_dir)
 
     print('Start training GMM')
     for epoch in tqdm(range(opt.n_epoch)):
@@ -130,10 +130,10 @@ def main():
             f.write('{},{:.3f},'.format(epoch, loss))
         save_checkpoint(model, os.path.join(save_dir, 'epoch_{:02}.pth'.format(epoch)))
         
-        # loss = trainer.val(epoch)
-        # print('Validation loss: {:.3f}'.format(loss))
-        # with open(log_name, 'a') as f:
-        #     f.write('{:.3f}\n'.format(loss))
+        loss = trainer.val(epoch)
+        print('Validation loss: {:.3f}'.format(loss))
+        with open(log_name, 'a') as f:
+            f.write('{:.3f}\n'.format(loss))
     print('Finish training GMM')
 
 if __name__=='__main__':
