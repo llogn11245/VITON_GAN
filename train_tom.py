@@ -22,8 +22,8 @@ class TOMTrainer:
 
         self.dataloader_train = dataloader_train
         self.dataloader_val = dataloader_val
-        self.optim_g = torch.optim.Adam(gen.parameters(), lr=0.00035, betas=(0.5, 0.999))
-        self.optim_d = torch.optim.Adam(dis.parameters(), lr=0.00035, betas=(0.5, 0.999))
+        self.optim_g = torch.optim.Adam(gen.parameters(), lr=0.0001, betas=(0.5, 0.999))
+        self.optim_d = torch.optim.Adam(dis.parameters(), lr=0.0001, betas=(0.5, 0.999))
         self.criterionL1 = nn.L1Loss()
         self.criterionVGG = VGGLoss()
         self.criterionAdv = torch.nn.BCELoss()
@@ -111,12 +111,12 @@ class TOMTrainer:
 
 def get_opt():
     parser = argparse.ArgumentParser(description='Train TOM model')
-    parser.add_argument('--n_epoch', '-e', type=int, default=100, help='number of epochs')
+    parser.add_argument('--n_epoch', '-e', type=int, default=60, help='number of epochs')
     parser.add_argument('--data_root', '-d', type=str, default='/content/viton_gan', help='path to data root directory')
     parser.add_argument('--out_dir', '-o', type=str, default='/content/result/train_tom', help='path to result directory')
     parser.add_argument('--name', '-n', type=str, default='TOM', help='model name')
-    parser.add_argument('--batch_size', '-b', type=int, default=16, help='batch size')
-    parser.add_argument('--n_worker', '-w', type=int, default=16, help='number of workers')
+    parser.add_argument('--batch_size', '-b', type=int, default=4, help='batch size')
+    parser.add_argument('--n_worker', '-w', type=int, default=4, help='number of workers')
     parser.add_argument('--gpu_id', '-g', type=str, default='0', help='GPU ID')
     parser.add_argument('--log_freq', type=int, default=100, help='log frequency')
     parser.add_argument('--radius', type=int, default=5)
