@@ -82,12 +82,12 @@ class GMMTrainer:
 
 def get_opt():
     parser = argparse.ArgumentParser(description='Train GMM model')
-    parser.add_argument('--n_epoch', '-e', type=int, default=100, help='number of epochs')
+    parser.add_argument('--n_epoch', '-e', type=int, default=60, help='number of epochs')
     parser.add_argument('--data_root', '-d', type=str, default='data', help='path to data root directory')
-    parser.add_argument('--out_dir', '-o', type=str, default='../result', help='path to result directory')
+    parser.add_argument('--out_dir', '-o', type=str, default='content/result/train_gmm', help='path to result directory')
     parser.add_argument('--name', '-n', type=str, default='GMM', help='model name')
-    parser.add_argument('--batch_size', '-b', type=int, default=16, help='batch size')
-    parser.add_argument('--n_worker', '-w', type=int, default=16, help='number of workers')
+    parser.add_argument('--batch_size', '-b', type=int, default=4, help='batch size')
+    parser.add_argument('--n_worker', '-w', type=int, default=4, help='number of workers')
     parser.add_argument('--gpu_id', '-g', type=str, default='0', help='GPU ID')
     parser.add_argument('--log_freq', type=int, default=100, help='log frequency')
     parser.add_argument('--fine_width', type=int, default=192)
