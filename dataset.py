@@ -10,8 +10,6 @@ import torchvision.transforms as transforms
 import torch.nn.functional as F
 
 class DatasetBase(Dataset):
-    """Base dataset for VITON-GAN.
-    """
     def __init__(self, opt, mode, data_list, train=True):
         super(DatasetBase, self).__init__()
         self.data_path = os.path.join(opt.data_root, mode)
@@ -38,8 +36,6 @@ class DatasetBase(Dataset):
         return len(self.person_names)
 
     def _get_mask_arrays(self, person_parse):
-        """Split person_parse array into mask channels
-        """
         shape = (person_parse > 0).astype(np.float32)
         head = (person_parse == 1).astype(np.float32) + \
                 (person_parse == 2).astype(np.float32) + \
@@ -63,8 +59,6 @@ class DatasetBase(Dataset):
         return im.resize((self.fine_width, self.fine_height), Image.BILINEAR) 
 
     def _load_pose(self, pose_name):
-        """Load pose json file
-        """
         with open(os.path.join(self.data_path, 'pose', pose_name), 'r') as f:
             pose_label = json.load(f)
             pose_data = pose_label['people'][0]['pose_keypoints']
